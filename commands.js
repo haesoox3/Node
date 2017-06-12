@@ -2,58 +2,77 @@ var fs = require('fs');
 var request = require('request');
 
 module.exports = {
-	pwd: function(file){
-		process.stdout.write(process.cwd());
-	},
-	date: function(file){
-		process.stdout.write((new Date()).toString().trim());
-	},
-	ls: function(){
-		fs.readdir('.', function(err, files) {
-			if (err) throw err;
-			files.forEach(function(file) {
-				process.stdout.write(file.toString() + "\n");
-			})
-		});
-	},
-	// Fix .join() to not include commas 
-	echo: function(){
-		var args = Array.from(arguments);
-		process.stdout.write(args.join(" "));
-	},
-	cat: function(file){
-		fs.readFile(file[0], "utf8", function read(err, data) {
-			if (err) throw err;
-			console.log(data);
-		});
-	},
-	// Fix readFile so prompt comes AFTER all reading is done for HEAD and CAT and TAIL
-	head: function(file){
-		var count = 0;
-		var contents; 
-		fs.readFile(file[0], "utf8", function read(err, data) {
-			if (err) throw err;
-			contents = data.split("\n");
-			while (count < 5){
-				console.log(contents[count]);
-				count ++; 
-			}
-		});
+	pwd: pwd,
+	date: date,
+	ls: ls, 
+	echo: echo,
+	cat: cat,
+	head: head,
+	tail: tail,
+	curl: curl
+}
 
-	},
-	tail: function(file){
-		var count = 0;
-		var contents; 
-		fs.readFile(file[0], "utf8", function read(err, data) {
-			if (err) throw err;
-			contents = data.split("\n");
-			while (count < 5){
-				console.log(contents[contents.length-(5-count)]);
-				count ++; 
-			}
-		});
-	},
-	curl: function(){
+function pwd(file ,done){
+	done(process.cwd());
+}
 
-	}
+function date(file, done){
+	done((new Date()).toString());
+}
+
+function ls(file, done){
+	var output = "";
+	fs.readdir('.', function(err, files) {
+		files.forEach(function(file) {
+			output += file.toString() + "\n";
+		})
+		done(output);
+	});
+}
+
+function cat(args, done){
+	fs.readFile(args[0], "utf8", function read(err, data) {
+		if (err) throw err;
+		done(data);
+	});
+}
+
+function echo(args, done){
+	done(args.join(" "));
+}
+
+function head(args,done){
+	var count = 0;
+	var contents;
+	var output = "";  
+	fs.readFile(args[0], "utf8", function read(err, data) {
+		if (err) throw err;
+		contents = data.split("\n");
+		while (count < 5){
+			output += contents[count] + "\n";
+			count ++; 
+		}
+		done(output);
+	});
+}
+
+function tail(args,done){
+	var count = 0;
+	var contents; 
+	var output = "";
+	fs.readFile(args[0], "utf8", function read(err, data) {
+		if (err) throw err;
+		contents = data.split("\n");
+		while (count < 5){
+			output += contents[contents.length-(5-count)] + "\n";
+			count ++; 
+		}
+		done(output);
+	});
+}
+
+function curl(args, done){
+	request(args[0], function (error, response, body) {
+  			done(body); // Print the HTML for the Google homepage.
+  		});
 }
