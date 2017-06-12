@@ -153,5 +153,15 @@ function wc(file, done){
 }
 
 function uniq(file, done){
-
+	fs.readFile(file[0], "utf8", function read(err, data) {
+		var uniqLines = []
+		if (err) throw err;
+		var lineList = data.split("\n");
+		lineList.forEach(function(line, i){
+			if ((i===0) || (i > 0 && line !== lineList[i-1])){
+				uniqLines.push(line);
+			}
+		});
+		done(uniqLines.join('\n'));
+	});
 }
