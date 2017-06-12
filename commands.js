@@ -1,4 +1,5 @@
 var fs = require('fs');
+var request = require('request');
 
 module.exports = {
 	pwd: function(file){
@@ -18,7 +19,6 @@ module.exports = {
 	// Fix .join() to not include commas 
 	echo: function(){
 		var args = Array.from(arguments);
-		//console.log(args);
 		process.stdout.write(args.join(" "));
 	},
 	cat: function(file){
@@ -27,10 +27,33 @@ module.exports = {
 			console.log(data);
 		});
 	},
+	// Fix readFile so prompt comes AFTER all reading is done for HEAD and CAT and TAIL
 	head: function(file){
+		var count = 0;
+		var contents; 
+		fs.readFile(file[0], "utf8", function read(err, data) {
+			if (err) throw err;
+			contents = data.split("\n");
+			while (count < 5){
+				console.log(contents[count]);
+				count ++; 
+			}
+		});
 
 	},
 	tail: function(file){
+		var count = 0;
+		var contents; 
+		fs.readFile(file[0], "utf8", function read(err, data) {
+			if (err) throw err;
+			contents = data.split("\n");
+			while (count < 5){
+				console.log(contents[contents.length-(5-count)]);
+				count ++; 
+			}
+		});
+	},
+	curl: function(){
 
 	}
 }

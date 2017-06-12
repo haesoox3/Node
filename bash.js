@@ -1,6 +1,4 @@
 var commands = require('./commands');
-// var userCommand = 'pwd';
-// commands[userCommand]();
 
 // Output a prompt
 process.stdout.write('prompt > ');
